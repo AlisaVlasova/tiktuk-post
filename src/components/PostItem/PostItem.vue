@@ -1,0 +1,238 @@
+<template>
+  <v-container class="post">
+    <a :href="`/profile/${post.authorMeta.name}`">
+      <v-avatar class="post__avatar">
+        <img
+          :src="post.authorMeta.avatar"
+          :alt="post.authorMeta.nickName"
+          data-test="post-avatar"
+        />
+      </v-avatar>
+    </a>
+
+    <div class="post__content">
+      <p class="post__nick" data-test="post-nickname">
+        {{ post.authorMeta.nickName }}
+      </p>
+      <p class="post__text" data-test="post-text">
+        {{ post.text }}
+      </p>
+      <ul
+        class="post__mentions"
+        v-if="post.mentions.length"
+        data-test="post-mentions"
+      >
+        <li
+          class="post__mention"
+          v-for="mention of post.mentions"
+          :key="mention"
+        >
+          {{ mention }}
+        </li>
+      </ul>
+      <ul class="post__tags" v-if="post.hashtags.length" data-test="post-tags">
+        <li class="post__tag" v-for="tag of post.hashtags" :key="tag.name">
+          #{{ tag.name }}
+        </li>
+      </ul>
+      <p class="post__music" data-test="post-music">
+        <strong>Original sound</strong> - {{ post.musicMeta.musicName }}
+      </p>
+
+      <div class="post__video-container">
+        <div class="post__video">
+          <video :ref="post.id" controls loop muted>
+            <source
+              data-test="post-video"
+              :src="post.videoUrl"
+              type="video/mp4"
+            />
+          </video>
+        </div>
+
+        <div class="post__side-bar">
+          <div class="post__likes post__side-item" data-test="post-hearts">
+            <div class="post__icon">
+              <v-icon>mdi-heart</v-icon>
+            </div>
+            {{ post.diggCount }}
+          </div>
+          <div class="post__comments post__side-item" data-test="post-comments">
+            >
+            <div class="post__icon">
+              <v-icon>mdi-comment</v-icon>
+            </div>
+            {{ post.commentCount }}
+          </div>
+          <div class="post__share post__side-item" data-test="post-shares">
+            >
+            <div class="post__icon">
+              <v-icon>mdi-share</v-icon>
+            </div>
+            {{ post.shareCount }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </v-container>
+</template>
+
+<script>
+import getElementVisible from '../../helpers/getElementVisible.js';
+
+import { VContainer, VAvatar, VIcon } from 'vuetify/lib';
+
+export default {
+  name: 'Post',
+  props: ['post'],
+  components: {
+    VContainer,
+    VAvatar,
+    VIcon
+  },
+  methods: {
+    play() {
+      if (getElementVisible(this.post.id)) {
+        this.$refs[this.post.id].play();
+      } else {
+        this.$refs[this.post.id].pause();
+      }
+    },
+  },
+  created() {
+    window.addEventListener('scroll', this.play);
+  },
+  destroyed() {
+    window.removeEventListener('scroll', this.play);
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.post {
+  display: flex;
+  flex-direction: column;
+
+  max-width: 600px;
+
+  padding: 24px 0;
+  margin: 0 auto;
+
+  border-bottom: 1px solid rgba(22, 24, 35, 0.2);
+
+  @media screen and (min-width: 768px) {
+    flex-direction: row;
+  }
+
+  @media screen and (min-width: 1600px) {
+    width: 800px;
+  }
+
+  &__avatar {
+    min-width: 55px;
+    max-width: 55px;
+    height: 55px;
+
+    margin: 0 0 8px 0;
+
+    border-radius: 50%;
+
+    @media screen and (min-width: 768px) {
+      margin: 0 16px 0 0;
+    }
+  }
+
+  &__content {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  &__nick {
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 25px;
+  }
+
+  &__mentions,
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+
+    margin-bottom: 16px;
+  }
+
+  &__music {
+    font-weight: normal;
+  }
+
+  &__video-container {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  &__side-bar {
+    margin-left: 16px;
+
+    @media screen and (min-width: 768px) {
+      margin-left: 24px;
+    }
+  }
+
+  &__side-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-bottom: 16px;
+
+    font-size: 12px;
+    line-height: 17px;
+    text-align: center;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+
+    margin-bottom: 8px;
+
+    background-color: rgba(22, 24, 35, 0.06);
+
+    border-radius: 50%;
+
+    @media screen and (min-width: 768px) {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  &__video {
+    position: relative;
+
+    @media screen and (min-width: 768px) {
+      max-width: 300px;
+    }
+
+    @media screen and (min-width: 1600px) {
+      max-width: 400px;
+    }
+  }
+
+  video,
+  img {
+    max-width: 100%;
+
+    border-radius: 20px;
+  }
+}
+</style>
